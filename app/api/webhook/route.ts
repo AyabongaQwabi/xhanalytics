@@ -119,3 +119,23 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const mode = searchParams.get('hub.mode');
+  const token = searchParams.get('hub.verify_token');
+  const challenge = searchParams.get('hub.challenge');
+
+  const VERIFY_TOKEN = process.env.NEXT_PUBLIC_FACEBOOK_VERIFY_TOKEN; // Store in environment variables
+
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    console.log('✅ Webhook verified successfully');
+    return new Response(challenge, { status: 200 }); // Facebook expects plain text response
+  } else {
+    console.error('❌ Webhook verification failed');
+    return NextResponse.json(
+      { error: 'Webhook verification failed' },
+      { status: 403 }
+    );
+  }
+}
