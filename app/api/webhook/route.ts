@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   try {
     const event = await req.json();
-    const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
-    const pageAccessToken = process.env.FACEBOOK_ACCESS_TOKEN;
+    const slackWebhookUrl = process.env.NEXT_PUBLIC_SLACK_WEBHOOK_URL;
+    const pageAccessToken = process.env.NEXT_PUBLIC_FACEBOOK_ACCESS_TOKEN;
     console.log('Received event:', event);
     if (!slackWebhookUrl || !pageAccessToken) {
       console.error('Missing Slack webhook URL or access token');
