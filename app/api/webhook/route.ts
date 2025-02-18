@@ -20,15 +20,29 @@ export async function POST(req: NextRequest) {
     const eventDetails = event.entry
       .map((entry: any) => {
         return entry.changes.map((change: any) => {
-          return {
-            field: change.field,
-            item: change.value.item,
-            post_id: change.value.post_id,
-            verb: change.value.verb,
-            message: change.value.message,
-            from: change.value.from,
-            created_time: change.value.created_time,
-          };
+          if (change.field === 'feed') {
+            return {
+              type: 'post',
+              field: change.field,
+              item: change.value.item,
+              post_id: change.value.post_id,
+              verb: change.value.verb,
+              message: change.value.message,
+              from: change.value.from,
+              created_time: change.value.created_time,
+            };
+          } else if (change.field === 'messages') {
+            return {
+              type: 'message',
+              field: change.field,
+              sender: change.value.sender.id,
+              recipient: change.value.recipient.id,
+              timestamp: change.value.timestamp,
+              message_id: change.value.message.mid,
+              text: change.value.message.text,
+              commands: change.value.message.commands,
+            };
+          }
         });
       })
       .flat();
@@ -36,8 +50,9 @@ export async function POST(req: NextRequest) {
     // Beautify the event message for Slack
     const slackMessage = {
       text: `*Received event from Facebook:*\n${eventDetails
-        .map(
-          (detail: any) => `
+        .map((detail: any) => {
+          if (detail.type === 'post') {
+            return `
 *Field:* ${detail.field}
 *Item:* ${detail.item}
 *Post ID:* ${detail.post_id}
@@ -45,8 +60,19 @@ export async function POST(req: NextRequest) {
 *Message:* ${detail.message}
 *From:* ${detail.from.name} (ID: ${detail.from.id})
 *Created Time:* ${new Date(detail.created_time * 1000).toLocaleString()}
-`
-        )
+`;
+          } else if (detail.type === 'message') {
+            return `
+*Field:* ${detail.field}
+*Sender ID:* ${detail.sender}
+*Recipient ID:* ${detail.recipient}
+*Timestamp:* ${new Date(detail.timestamp * 1000).toLocaleString()}
+*Message ID:* ${detail.message_id}
+*Text:* ${detail.text}
+*Commands:* ${detail.commands.map((command: any) => command.name).join(', ')}
+`;
+          }
+        })
         .join('\n')}`,
     };
 
