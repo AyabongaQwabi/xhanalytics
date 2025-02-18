@@ -30,3 +30,15 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.log('\n\nError pposting comment:', error);
+    return NextResponse.json(
+      { error: 'Failed to post comment' },
+      { status: 500 }
+    );
+  }
+}
