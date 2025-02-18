@@ -44,6 +44,12 @@ export async function POST(req: NextRequest) {
               text: change.value.message.text,
               commands: change.value.message.commands,
             };
+          } else {
+            return {
+              type: 'unknown',
+              field: change.field,
+              value: change.value,
+            };
           }
         });
       })
