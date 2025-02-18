@@ -5,8 +5,9 @@ export async function POST(req: NextRequest) {
     const event = await req.json();
     const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
     const pageAccessToken = process.env.FACEBOOK_ACCESS_TOKEN;
-
+    console.log('Received event:', event);
     if (!slackWebhookUrl || !pageAccessToken) {
+      console.error('Missing Slack webhook URL or access token');
       return NextResponse.json(
         { error: 'Missing Slack webhook URL or access token' },
         { status: 400 }
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
         });
       })
       .flat();
-
+    console.log('Sending Event details:', eventDetails);
     // Beautify the event message for Slack
     const slackMessage = {
       text: `*Received event from Facebook:*\n${eventDetails
@@ -82,9 +83,11 @@ export async function POST(req: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(slackMessage),
     });
+    console.log('Sent event to Slack');
 
     // Check if the event is a new post
     if (event.object === 'page' && event.entry) {
+      console.log('posting comment on facebook post');
       for (const entry of event.entry) {
         for (const change of entry.changes) {
           if (change.field === 'feed' && change.value.item === 'post') {
@@ -104,6 +107,8 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+
+    console.log('Processed event successfully');
 
     return NextResponse.json({ success: true });
   } catch (error) {
