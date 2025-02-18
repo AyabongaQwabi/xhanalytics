@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     const eventDetails = event.entry
       .map((entry: any) => {
         return entry.changes.map((change: any) => {
+          console.log('\nchange:', change);
           if (change.field === 'feed') {
             return {
               type: 'post',
