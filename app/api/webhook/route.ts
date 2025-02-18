@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('Received event');
     const event = await req.json();
+    console.log('Event:', event);
     const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL;
     const pageAccessToken = process.env.FACEBOOK_ACCESS_TOKEN;
 
     if (!slackWebhookUrl || !pageAccessToken) {
+      console.log('Missing Slack webhook URL or access token');
       return NextResponse.json(
         { error: 'Missing Slack webhook URL or access token' },
         { status: 400 }
