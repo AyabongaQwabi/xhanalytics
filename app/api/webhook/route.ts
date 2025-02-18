@@ -79,6 +79,11 @@ export async function POST(req: NextRequest) {
 *Text:* ${detail.text}
 *Commands:* ${detail.commands.map((command: any) => command.name).join(', ')}
 `;
+          } else {
+            return `
+*Field:* ${detail.field}    
+*Value:* ${detail.value}
+`;
           }
         })
         .join('\n')}`,
